@@ -1,0 +1,94 @@
+# https://taskfile.dev
+
+version: '3'
+
+dotenv: ['.env']
+
+
+tasks:
+  echo:
+    cmds:
+      - echo $APP_NAMESPACE
+  exec:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE /bin/bash
+  check:
+    cmds:
+      - task: pint-test
+      - task: rector
+      - task: insights
+      - task: stan
+      - task: test
+
+  init:
+    cmds:
+      - task: build
+      - task: composer-install
+      - task: key-generate
+      - task: storage-link
+      - docker exec -it app-$APP_NAMESPACE php artisan horizon:install
+      - task: db-migrate
+      - task: db-seed
+      - task: restart
+
+  build:
+    cmds:
+      - docker-compose up -d --build
+  up:
+    cmds:
+      - docker-compose up -d --remove-orphans
+  build-prod:
+    cmds:
+      - docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+  up-prod:
+    cmds:
+      - docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+  restart:
+    cmds:
+      - docker-compose restart
+  stop:
+    cmds:
+      - docker-compose stop
+  down:
+    cmds:
+      - docker-compose down -v
+  composer-install:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE composer install
+  key-generate:
+    - docker exec -it app-$APP_NAMESPACE php artisan key:generate
+  storage-link:
+    - docker exec -it app-$APP_NAMESPACE php artisan storage:link
+  db-migrate:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE php artisan migrate
+  db-seed:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE php artisan db:seed
+  cache-clear:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE php artisan cache:clear
+  pint:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE vendor/bin/pint --config ./pint.json
+  pint-test:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE vendor/bin/pint --test --config ./pint.json
+  stan:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE vendor/bin/phpstan analyse -c ./phpstan.neon
+  rector:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE vendor/bin/rector process
+  insights:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE vendor/bin/phpinsights --quiet
+  test:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE php artisan test
+  tink:
+    cmds:
+      - docker exec -it app-$APP_NAMESPACE php artisan tink
+
+
+

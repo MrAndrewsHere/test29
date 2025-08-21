@@ -1,0 +1,60 @@
+x-app: &x-app
+    build:
+        context: .
+        dockerfile: ./docker/app/Dockerfile
+    env_file:
+        - .env
+    container_name: app-${APP_NAMESPACE}
+    depends_on:
+        - db
+        - redis
+    networks:
+        - laravel_network
+
+services:
+    app:
+        <<: *x-app
+#        user: "${UID:-1000}:${GID:-1000}"
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/var/www/html
+            - ./docker/supervisor/common.conf:/etc/supervisor/common.conf
+            - ./docker/supervisor/dev.conf:/etc/supervisor/conf.d/supervisord.conf
+
+    scheduler:
+        <<: *x-app
+        container_name: scheduler-${APP_NAMESPACE}
+#        user: "${UID:-1000}:${GID:-1000}"
+        command: >
+            sh -c "while true; do
+            php artisan schedule:run --verbose --no-interaction;
+            sleep 60;
+            done"
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - app
+    db:
+        image: postgres:latest
+        env_file:
+            - .env
+        container_name: db-${APP_NAMESPACE}
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        networks:
+            - laravel_network
+
+    redis:
+        image: redis:latest
+        container_name: redis-${APP_NAMESPACE}
+        restart: unless-stopped
+        env_file:
+            - .env
+        networks:
+            - laravel_network
+
+networks:
+    laravel_network:
