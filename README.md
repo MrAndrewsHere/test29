@@ -2,13 +2,25 @@
 
 <h1 align="center"><a href="https://frankenphp.dev"><img src="frankenphp.png" alt="FrankenPHP" width="400"></a></h1>
 
+
+# test29
+
+API
+
+- Список марок автомобилей;
+- Список моделей автомобилей;
+- Список + CRUD автомобилей.
+
 # Getting Started
 
 ## Настройка окружения
 
-1. Скопируйте файл окружения:
+1. Скопируйте файлы окружения:
 ```bash
 cp .env.example .env
+```
+```bash
+cp .env.testing.example .env.testing
 ```
 2. Настройте необходимые переменные в `.env`:
 ```bash
@@ -28,7 +40,7 @@ docker-compose up -d --build
 ```
 
 ```bash
-docker exec -it value-app /bin/bash
+docker exec -it value-app /bin/bash # вместо 'value' - значение APP_NAMESPACE из .env 
 ```
 
 Внутри контейнера:
@@ -50,13 +62,14 @@ php artisan db:seed
 ```bash
 exit
 ```
+За пределами контейнера:
 ```bash
 docker-compose stop
 ```
 ```bash
 docker-compose start
 ```
-
+// docker-compose restart может вызвать ошибку
 ## Taskfile
 
 ```bash
@@ -84,7 +97,7 @@ task check
 или
 
 ```bash
-docker exec -it value-app /bin/bash
+docker exec -it value-app /bin/bash  # вместо 'value' - значение APP_NAMESPACE из .env
 ```
 
 ```bash
@@ -102,8 +115,3 @@ vendor/bin/phpstan analyse -c ./phpstan.neon
 ```bash
 php artisan test
 ```
-
-
-# About 
-
-Description
