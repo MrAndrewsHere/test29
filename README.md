@@ -28,6 +28,10 @@ APP_NAMESPACE=value
 ```
 3. Инициализация проекта:
 
+С использованием make:
+```bash
+make init
+```
 С использованием Taskfile (https://taskfile.dev/docs/installation#get-the-binary):
 ```bash
 task init
@@ -70,32 +74,35 @@ docker-compose stop
 docker-compose start
 ```
 // docker-compose restart может вызвать ошибку
-## Taskfile
+## Commonly used tasks
 
 ```bash
-task exec
+make/task exec
 ```
 ```bash
-task up
+make/task up
 ```
 ```bash
-task stop
+make/task stop
 ```
 ```bash
-task tink
+make/task tink
 ```
 ```bash
-task check
+make/task check
 ```
 
 
 
 # Code quality: 
 ```bash
+make check
+```
+или
+```bash
 task check
 ```
 или
-
 ```bash
 docker exec -it value-app /bin/bash  # вместо 'value' - значение APP_NAMESPACE из .env
 ```
